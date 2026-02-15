@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, MessageSquare, Receipt, Wallet, BarChart3 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, MessageSquare, Receipt, BarChart3, Wallet, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -14,6 +15,15 @@ const navItems = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  if (pathname === "/login") return null;
+
+  const handleLogout = async () => {
+    await fetch("/api/auth", { method: "DELETE" });
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -22,7 +32,7 @@ export function Navbar() {
           <Wallet className="h-5 w-5 text-primary" />
           <span>FinTrack</span>
         </Link>
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-1 flex-1">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -39,6 +49,10 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
+        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
+          <LogOut className="h-4 w-4" />
+          <span className="hidden sm:inline ml-1">Logout</span>
+        </Button>
       </div>
     </header>
   );
